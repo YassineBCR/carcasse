@@ -1,47 +1,102 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #f7f2e7;
-  --color-surface: rgba(255, 255, 255, 0.58);
-  --color-border: rgba(255, 255, 255, 0.52);
-  --color-primary: #0e3b2d;
+  --color-bg: #f4f0e6;
+  --color-primary: #0f3d2e;
+  --color-primary-light: #164936;
   --color-accent: #c8a752;
-  --shadow-soft: 0 12px 42px rgba(12, 36, 28, 0.09);
+  --color-accent-hover: #b89542;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(1200px 500px at 20% -10%, rgba(200, 167, 82, 0.14), transparent),
-    radial-gradient(900px 460px at 100% 0%, rgba(14, 59, 45, 0.1), transparent),
+  /* Arrière-plan avec des halos de lumière doux pour sublimer le glassmorphism */
+  background: 
+    radial-gradient(circle at 15% 50%, rgba(200, 167, 82, 0.15), transparent 30%),
+    radial-gradient(circle at 85% 10%, rgba(15, 61, 46, 0.12), transparent 35%),
     var(--color-bg);
+  background-attachment: fixed;
   color: var(--color-primary);
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2,
-h3,
-h4 {
+h1, h2, h3, h4 {
   font-family: "Georgia", "Times New Roman", serif;
   letter-spacing: -0.01em;
 }
 
-#root {
-  min-height: 100vh;
-}
+/* --- Utilitaires de Glassmorphism & Design --- */
 
+/* Verre principal pour les conteneurs */
 .glass {
-  background: var(--color-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-soft);
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(15, 61, 46, 0.05);
 }
 
+/* Verre plus opaque pour les éléments mis en avant (cartes, formulaires) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+}
+
+/* Inputs de formulaires modernes */
+.glass-input {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(200, 167, 82, 0.15);
+  outline: none;
+}
+
+/* Boutons modernes avec ombres dynamiques */
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(15, 61, 46, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(15, 61, 46, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: #112f24;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(200, 167, 82, 0.25);
+}
+
+.btn-accent:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 167, 82, 0.35);
+}
+
+/* Titres dégradés subtils */
 .title-gradient {
-  background: linear-gradient(135deg, #0e3b2d 0%, #275f4f 55%, #836717 100%);
+  background: linear-gradient(135deg, #0f3d2e 0%, #275f4f 45%, #c8a752 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

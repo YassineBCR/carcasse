@@ -39,72 +39,92 @@ export function LoginPage() {
   }
 
   return (
-    <div className="glass mx-auto max-w-md rounded-3xl p-6 sm:p-7">
-      <p className="mb-2 text-sm font-medium text-[#7a5f1a]">Mon Belier</p>
-      <h1 className="title-gradient text-3xl">{isSignup ? 'Creer un compte' : 'Connexion'}</h1>
-      {!isSupabaseConfigured && (
-        <p className="mt-3 rounded-xl border border-amber-600 bg-amber-100 p-3 text-sm text-amber-900">
-          Supabase n&apos;est pas configure. Renseigne `.env` puis redemarre le serveur.
-        </p>
-      )}
-      <form onSubmit={onSubmit} className="mt-5 space-y-3">
-        <input
-          className="w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
-          name="email"
-          type="email"
-          placeholder="Email"
-          onChange={onChange}
-          value={form.email}
-          required
-        />
-        <input
-          className="w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
-          name="password"
-          type="password"
-          placeholder="Mot de passe"
-          onChange={onChange}
-          value={form.password}
-          required
-        />
-        {isSignup && (
-          <>
+    <div className="flex items-center justify-center py-10">
+      <div className="glass-panel w-full max-w-md rounded-[2rem] p-8 sm:p-10 shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#c8a752]/20 text-2xl">
+            🐑
+          </div>
+          <h1 className="title-gradient text-3xl mb-2">{isSignup ? 'Créer un compte' : 'Bon retour'}</h1>
+          <p className="text-sm text-[#305547]">
+            {isSignup ? 'Rejoignez-nous pour réserver' : 'Connectez-vous à votre espace personnel'}
+          </p>
+        </div>
+
+        {!isSupabaseConfigured && (
+          <p className="mb-6 rounded-xl border border-amber-600/30 bg-amber-500/10 p-4 text-sm text-amber-900 text-center">
+            Supabase n&apos;est pas configuré. Renseignez `.env`.
+          </p>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          {isSignup && (
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                className="glass-input w-full rounded-xl px-4 py-3.5 outline-none placeholder:text-[#0f3d2e]/50"
+                name="prenom"
+                placeholder="Prénom"
+                onChange={onChange}
+                value={form.prenom}
+              />
+              <input
+                className="glass-input w-full rounded-xl px-4 py-3.5 outline-none placeholder:text-[#0f3d2e]/50"
+                name="nom"
+                placeholder="Nom"
+                onChange={onChange}
+                value={form.nom}
+              />
+            </div>
+          )}
+          
+          <input
+            className="glass-input w-full rounded-xl px-4 py-3.5 outline-none placeholder:text-[#0f3d2e]/50"
+            name="email"
+            type="email"
+            placeholder="Adresse e-mail"
+            onChange={onChange}
+            value={form.email}
+            required
+          />
+          <input
+            className="glass-input w-full rounded-xl px-4 py-3.5 outline-none placeholder:text-[#0f3d2e]/50"
+            name="password"
+            type="password"
+            placeholder="Mot de passe"
+            onChange={onChange}
+            value={form.password}
+            required
+          />
+
+          {isSignup && (
             <input
-              className="w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
-              name="nom"
-              placeholder="Nom"
-              onChange={onChange}
-              value={form.nom}
-            />
-            <input
-              className="w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
-              name="prenom"
-              placeholder="Prenom"
-              onChange={onChange}
-              value={form.prenom}
-            />
-            <input
-              className="w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
+              className="glass-input w-full rounded-xl px-4 py-3.5 outline-none placeholder:text-[#0f3d2e]/50"
               name="telephone"
-              placeholder="Telephone"
+              placeholder="Numéro de téléphone"
               onChange={onChange}
               value={form.telephone}
             />
-          </>
-        )}
-        {error && <p className="text-sm text-red-700">{error}</p>}
-        <button
-          disabled={loading || !isSupabaseConfigured}
-          className="w-full rounded-xl bg-[#0f3d2e] px-4 py-3 font-medium text-[#f7f2e7] transition hover:-translate-y-0.5 hover:bg-[#164936] disabled:opacity-60"
-        >
-          {loading ? 'Traitement...' : isSignup ? 'Inscription' : 'Se connecter'}
-        </button>
-      </form>
-      <button
-        onClick={() => setIsSignup((v) => !v)}
-        className="mt-4 text-sm font-medium text-[#0f3d2e] underline underline-offset-4"
-      >
-        {isSignup ? 'Deja inscrit ? Connexion' : 'Nouveau client ? Inscription'}
-      </button>
+          )}
+
+          {error && <p className="text-sm font-medium text-red-500 text-center">{error}</p>}
+          
+          <button
+            disabled={loading || !isSupabaseConfigured}
+            className="btn-primary mt-2 w-full rounded-xl px-4 py-4 font-bold tracking-wide"
+          >
+            {loading ? 'Traitement...' : isSignup ? 'M\'inscrire' : 'Se connecter'}
+          </button>
+        </form>
+
+        <div className="mt-8 text-center">
+          <button
+            onClick={() => setIsSignup((v) => !v)}
+            className="text-sm font-medium text-[#0f3d2e] hover:text-[#c8a752] transition-colors"
+          >
+            {isSignup ? 'Déjà inscrit ? Connectez-vous' : 'Nouveau client ? Créez un compte'}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

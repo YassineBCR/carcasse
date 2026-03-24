@@ -3,6 +3,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { supabase } from '../lib/supabase'
 import { UNIT_PRICE } from '../lib/constants'
 import { useAuth } from '../contexts/AuthContext'
+import { CreditCard, MapPin, Users } from 'lucide-react'
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '')
 
@@ -83,69 +84,98 @@ export function ReservationPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Impossible de creer la session Stripe')
+        throw new Error('Impossible de créer la session Stripe')
       }
 
       const payload = await response.json()
       const stripe = await stripePromise
       await stripe.redirectToCheckout({ sessionId: payload.sessionId })
     } catch (err) {
-      setError(err.message ?? 'Erreur de reservation')
+      setError(err.message ?? 'Erreur de réservation')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="glass space-y-5 rounded-3xl p-6 sm:p-8">
-      <h1 className="title-gradient text-3xl">Reservation</h1>
-      <label className="block">
-        <span className="text-sm font-semibold uppercase tracking-wide text-[#305547]">Mosquee de retrait</span>
-        <select
-          className="mt-2 w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
-          value={form.mosquee_id}
-          onChange={(e) => setForm((prev) => ({ ...prev, mosquee_id: e.target.value }))}
+    <div className="mx-auto max-w-2xl">
+      <div className="glass-panel space-y-8 rounded-[2rem] p-8 sm:p-12">
+        <div className="text-center">
+          <h1 className="title-gradient text-4xl mb-2">Réservation</h1>
+          <p className="text-[#305547]">Préparez votre commande en quelques étapes</p>
+        </div>
+
+        <div className="space-y-6">
+          <label className="block">
+            <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#0f3d2e]">
+              <MapPin size={16} className="text-[#c8a752]" /> Point de retrait
+            </span>
+            <select
+              className="glass-input w-full rounded-2xl px-5 py-4 text-lg text-[#0f3d2e] cursor-pointer"
+              value={form.mosquee_id}
+              onChange={(e) => setForm((prev) => ({ ...prev, mosquee_id: e.target.value }))}
+            >
+              {mosquees.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.nom} - {m.ville}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-[#c8a752]/30 to-transparent"></div>
+
+          <label className="block">
+            <span className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#0f3d2e]">
+              <Users size={16} className="text-[#c8a752]" /> Quantité désirée
+            </span>
+            <input
+              className="glass-input w-full rounded-2xl px-5 py-4 text-lg text-[#0f3d2e]"
+              type="number"
+              min={1}
+              value={form.quantite}
+              onChange={(e) => updateQuantite(e.target.value)}
+            />
+          </label>
+
+          <div className="space-y-3 rounded-2xl bg-white/30 p-5 border border-white/40">
+            <span className="mb-3 block text-sm font-semibold uppercase tracking-wide text-[#0f3d2e]">
+              Noms pour le sacrifice
+            </span>
+            {form.noms.map((nom, index) => (
+              <input
+                key={index}
+                className="glass-input w-full rounded-xl px-4 py-3 text-md text-[#0f3d2e]"
+                placeholder={`Nom de la personne n°${index + 1}`}
+                value={nom}
+                onChange={(e) => updateNom(index, e.target.value)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-gradient-to-br from-[#0f3d2e] to-[#164936] p-6 text-white shadow-xl">
+          <div className="flex items-center justify-between">
+            <span className="text-lg opacity-80">Total à régler</span>
+            <span className="text-3xl font-bold text-[#c8a752]">{total.toLocaleString('fr-FR')} €</span>
+          </div>
+        </div>
+
+        {error && (
+          <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600 border border-red-100">
+            {error}
+          </div>
+        )}
+
+        <button
+          onClick={checkout}
+          disabled={loading || !form.mosquee_id}
+          className="btn-primary flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-lg font-bold uppercase tracking-wide"
         >
-          {mosquees.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.nom} - {m.ville}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="block">
-        <span className="text-sm font-semibold uppercase tracking-wide text-[#305547]">Quantite</span>
-        <input
-          className="mt-2 w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
-          type="number"
-          min={1}
-          value={form.quantite}
-          onChange={(e) => updateQuantite(e.target.value)}
-        />
-      </label>
-      <div className="space-y-2">
-        <span className="text-sm font-semibold uppercase tracking-wide text-[#305547]">Noms pour le sacrifice</span>
-        {form.noms.map((nom, index) => (
-          <input
-            key={index}
-            className="w-full rounded-xl border border-[#d7ceb9] bg-white/80 px-4 py-3 outline-none transition focus:border-[#c8a752]"
-            placeholder={`Nom ${index + 1}`}
-            value={nom}
-            onChange={(e) => updateNom(index, e.target.value)}
-          />
-        ))}
+          <CreditCard size={20} />
+          {loading ? 'Redirection sécurisée...' : 'Payer avec Stripe'}
+        </button>
       </div>
-      <div className="rounded-2xl border border-[#c8a752]/30 bg-[#efe4ca] p-4 text-lg font-semibold text-[#234f3f]">
-        Total: {total.toLocaleString('fr-FR')} EUR
-      </div>
-      {error && <p className="text-sm text-red-700">{error}</p>}
-      <button
-        onClick={checkout}
-        disabled={loading || !form.mosquee_id}
-        className="w-full rounded-xl bg-[#0f3d2e] px-4 py-3 font-medium text-[#f7f2e7] transition hover:-translate-y-0.5 hover:bg-[#164936] disabled:opacity-60"
-      >
-        {loading ? 'Preparation du paiement...' : 'Payer avec Stripe'}
-      </button>
     </div>
   )
 }

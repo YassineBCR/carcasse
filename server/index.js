@@ -77,14 +77,19 @@ app.get('/health', (_req, res) => {
 
 app.post('/create-checkout-session', async (req, res) => {
   try {
-    const { reservationId, quantity } = req.body
+    // Récupération du customer_email envoyé depuis le frontend
+    const { reservationId, quantity, customer_email } = req.body
+    
     if (!reservationId || !quantity) {
       return res.status(400).json({ error: 'reservationId et quantity sont requis' })
     }
+    
     const successUrl = `${frontendUrl}/espace-client?checkout=success`
     const cancelUrl = `${frontendUrl}/reservation?checkout=cancel`
+    
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
+      customer_email: customer_email || undefined, // Pré-remplit l'email sur Stripe
       line_items: [
         {
           quantity,
@@ -109,6 +114,7 @@ app.post('/create-checkout-session', async (req, res) => {
       .update({ stripe_checkout_session_id: session.id })
       .eq('id', reservationId)
 
+    // Le backend renvoie explicitement l'URL pour la redirection
     return res.json({ sessionId: session.id, url: session.url })
   } catch (err) {
     console.error(err)

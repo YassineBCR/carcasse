@@ -1,12 +1,28 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Leaf, ShieldCheck, Truck, ArrowRight } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export function HomePage() {
-  const { isSupabaseConfigured } = useAuth()
+  const { isSupabaseConfigured, user, role } = useAuth()
+  const navigate = useNavigate()
+
+  const handleReservationClick = (e) => {
+    e.preventDefault()
+    
+    if (!user) {
+      // 1. Non connecté -> Redirection vers la page de connexion
+      navigate('/connexion')
+    } else if (role === 'client') {
+      // 2. Connecté en tant que client -> Accès à la réservation
+      navigate('/reservation')
+    } else {
+      // 3. Connecté mais avec un autre rôle (admin, livreur...)
+      alert("L'espace de réservation est exclusivement réservé aux comptes clients.")
+    }
+  }
 
   return (
-    <div className="space-y-8 sm:space-y-12">
+    <div className="space-y-8 sm:space-y-12 animate-in fade-in duration-700">
       {!isSupabaseConfigured && (
         <section className="glass-panel rounded-2xl border-l-4 border-l-amber-500 p-5 text-amber-900">
           <p className="font-medium">⚠️ Configuration requise</p>
@@ -36,10 +52,15 @@ export function HomePage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 items-center sm:justify-start justify-center">
-            <Link to="/reservation" className="btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-lg font-semibold">
+            {/* Le bouton intelligent est ici */}
+            <button 
+              onClick={handleReservationClick} 
+              className="btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-lg font-semibold cursor-pointer"
+            >
               Réserver maintenant <ArrowRight size={20} />
-            </Link>
-            <Link to="/connexion" className="glass-input w-full sm:w-auto rounded-2xl px-8 py-4 text-lg font-medium text-[#0f3d2e] text-center hover:bg-white">
+            </button>
+            
+            <Link to="/connexion" className="glass-input w-full sm:w-auto rounded-2xl px-8 py-4 text-lg font-medium text-[#0f3d2e] text-center hover:bg-white transition">
               Espace Client
             </Link>
           </div>

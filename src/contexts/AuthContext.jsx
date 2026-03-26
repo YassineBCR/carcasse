@@ -25,7 +25,6 @@ export function AuthProvider({ children }) {
 
     let alive = true
 
-    // Correction ajoutée ici : le .catch() permet de débloquer l'interface en cas d'erreur
     supabase.auth.getSession()
       .then(async ({ data }) => {
         if (!alive) return

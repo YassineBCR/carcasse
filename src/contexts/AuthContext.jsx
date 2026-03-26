@@ -25,14 +25,20 @@ export function AuthProvider({ children }) {
 
     let alive = true
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!alive) return
-      setSession(data.session ?? null)
-      if (data.session?.user?.id) {
-        await loadProfile(data.session.user.id)
-      }
-      setLoading(false)
-    })
+    // Correction ajoutée ici : le .catch() permet de débloquer l'interface en cas d'erreur
+    supabase.auth.getSession()
+      .then(async ({ data }) => {
+        if (!alive) return
+        setSession(data.session ?? null)
+        if (data.session?.user?.id) {
+          await loadProfile(data.session.user.id)
+        }
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error("Erreur de connexion Supabase:", error)
+        setLoading(false) 
+      })
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
       setSession(currentSession ?? null)

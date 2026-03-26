@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { 
   Plus, MapPin, Phone, User, X, Building2, Loader2, Hash,
-  ShoppingBag, Calendar, CheckCircle2, Clock, XCircle, Pencil, ShieldCheck
+  CheckCircle2, Clock, XCircle, Pencil, ShieldCheck
 } from 'lucide-react'
 
 const TAB_ITEMS = [
@@ -132,12 +132,16 @@ export function AdminGlobalPage() {
     }
   }
 
-  // --- Fonctions utilitaires de rendu inchangées (renderPaiementBadge, renderLivraisonBadge) ---
-  const renderPaiementBadge = (statut) => { /* ... (gardez votre code existant pour les badges) ... */
-     return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border">{statut}</span>
+  const renderPaiementBadge = (statut) => {
+    if (statut === 'payé') return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20 bg-emerald-50 text-emerald-700"><CheckCircle2 size={12}/> Payé</span>
+    if (statut === 'en_attente') return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/20 bg-amber-50 text-amber-700"><Clock size={12}/> En attente</span>
+    return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border border-red-500/20 bg-red-50 text-red-700"><XCircle size={12}/> {statut}</span>
   }
-  const renderLivraisonBadge = (statut) => { /* ... (gardez votre code existant pour les badges) ... */
-     return <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border">{statut}</span>
+
+  const renderLivraisonBadge = (statut) => {
+    if (statut === 'livré') return <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/20 bg-emerald-50 text-emerald-700">Livré</span>
+    if (statut === 'en_transit') return <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border border-blue-500/20 bg-blue-50 text-blue-700">En transit</span>
+    return <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border border-amber-500/20 bg-amber-50 text-amber-700">En attente</span>
   }
 
   return (
@@ -218,10 +222,50 @@ export function AdminGlobalPage() {
           )}
 
           {activeTab === 'commandes' && (
-             <div className="glass-panel rounded-3xl p-12 text-center text-[#0f3d2e]/60">
-                 {/* ... (gardez votre code d'affichage des commandes) ... */}
-                 Commandes...
-             </div>
+            <div className="glass-panel overflow-hidden rounded-3xl animate-in slide-in-from-bottom-4 duration-500">
+               <div className="overflow-x-auto">
+                 <table className="w-full text-left text-sm">
+                   <thead className="bg-[#0f3d2e]/5 text-[#0f3d2e]">
+                     <tr>
+                       <th className="p-4 font-semibold">Date</th>
+                       <th className="p-4 font-semibold">Client</th>
+                       <th className="p-4 font-semibold">Mosquée</th>
+                       <th className="p-4 font-semibold">Qté</th>
+                       <th className="p-4 font-semibold">Total</th>
+                       <th className="p-4 font-semibold">Paiement</th>
+                       <th className="p-4 font-semibold">Livraison</th>
+                       <th className="p-4 font-semibold">Code</th>
+                     </tr>
+                   </thead>
+                   <tbody className="divide-y divide-white/20">
+                     {reservations.length === 0 ? (
+                       <tr>
+                         <td colSpan="8" className="p-8 text-center text-[#0f3d2e]/60">Aucune commande pour le moment.</td>
+                       </tr>
+                     ) : (
+                       reservations.map((r) => (
+                         <tr key={r.id} className="transition-colors hover:bg-white/40">
+                           <td className="p-4 text-[#305547]">
+                             {new Date(r.created_at).toLocaleDateString('fr-FR')}
+                           </td>
+                           <td className="p-4 font-medium text-[#0f3d2e]">{r.users?.email || 'N/A'}</td>
+                           <td className="p-4 text-[#305547]">{r.mosquees?.nom || '-'} ({r.mosquees?.ville || '-'})</td>
+                           <td className="p-4 font-bold text-[#0f3d2e]">{r.quantite}</td>
+                           <td className="p-4 font-bold text-[#c8a752]">{r.prix_total} €</td>
+                           <td className="p-4">{renderPaiementBadge(r.statut_paiement)}</td>
+                           <td className="p-4">{renderLivraisonBadge(r.statut_livraison)}</td>
+                           <td className="p-4">
+                             {r.code_retrait ? (
+                               <span className="font-mono bg-white/60 px-2 py-1 rounded text-[#0f3d2e] font-bold tracking-widest">{r.code_retrait}</span>
+                             ) : '-'}
+                           </td>
+                         </tr>
+                       ))
+                     )}
+                   </tbody>
+                 </table>
+               </div>
+            </div>
           )}
         </>
       )}
@@ -263,7 +307,7 @@ export function AdminGlobalPage() {
               </div>
             </form>
 
-            {/* SECTION: ASSIGNER UN ADMIN (Uniquement en mode édition) */}
+            {/* SECTION: ASSIGNER UN ADMIN */}
             {editingMosqueeId && (
               <div className="mt-8 pt-8 border-t border-[#0f3d2e]/10">
                 <h3 className="text-lg font-bold text-[#0f3d2e] mb-4 flex items-center gap-2">
